@@ -1,0 +1,21 @@
+---
+- name: Apply common baseline to every managed VM
+  hosts: all
+  become: true
+  roles:
+    - common
+    - ntp
+    - monitoring
+
+- name: Configure Kubernetes container runtime and prerequisites
+  hosts: kubernetes
+  become: true
+  roles:
+    - container
+    - kubernetes
+
+- name: Configure independent PostgreSQL database VM
+  hosts: database
+  become: true
+  roles:
+    - postgres

@@ -1,0 +1,31 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: fds-api
+  namespace: fds
+  labels:
+    app.kubernetes.io/name: fds-api
+spec:
+  selector:
+    app.kubernetes.io/name: fds-api
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: fds-api
+  namespace: fds
+  labels:
+    app.kubernetes.io/name: fds-api
+spec:
+  to:
+    kind: Service
+    name: fds-api
+  port:
+    targetPort: http
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect

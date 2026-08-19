@@ -1,0 +1,26 @@
+groups:
+  - name: financial-fds-api
+    rules:
+      - alert: FdsApiTargetDown
+        expr: up{job="fds-api"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "FDS API scrape target is unavailable"
+
+      - alert: TransactionPersistenceFailure
+        expr: increase(transaction_save_failure_total[5m]) > 0
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "FDS API has transaction persistence failures"
+
+      - alert: MissingClientIp
+        expr: increase(missing_client_ip_total[10m]) > 0
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "FDS API did not receive a client IP through the trusted proxy path"

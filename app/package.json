@@ -1,0 +1,17 @@
+{
+  "name": "financial-fds-api",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Hybrid Financial FDS Platform - Fastify API",
+  "type": "module",
+  "scripts": {
+    "start": "node src/server.js",
+    "test": "node --test",
+    "migrate": "node src/scripts/migrate.js"
+  },
+  "dependencies": {
+    "fastify": "^5.0.0",
+    "pg": "^8.13.1",
+    "prom-client": "^15.1.3"
+  }
+}

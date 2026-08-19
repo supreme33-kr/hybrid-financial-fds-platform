@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: fds-api-config
+  namespace: fds
+data:
+  PORT: "3000"
+  # Change this to the dedicated HAProxy VM address after the IP plan is finalized.
+  TRUSTED_PROXY_CIDRS: "10.1.93.55/32"
+  DATABASE_SSL: "false"

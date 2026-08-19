@@ -1,0 +1,23 @@
+---
+- name: Configure chrony time sources
+  ansible.builtin.copy:
+    dest: /etc/chrony.conf
+    owner: root
+    group: root
+    mode: "0644"
+    content: |
+      {% for server in chrony_servers %}
+      pool {{ server }} iburst
+      {% endfor %}
+      driftfile /var/lib/chrony/drift
+      makestep 1.0 3
+      rtcsync
+      keyfile /etc/chrony.keys
+      leapsectz right/UTC
+  notify: Restart chronyd
+
+- name: Ensure chronyd is enabled and running
+  ansible.builtin.service:
+    name: chronyd
+    state: started
+    enabled: true

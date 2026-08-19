@@ -1,0 +1,6 @@
+apiVersion: project.openshift.io/v1
+kind: Project
+metadata:
+  name: fds
+  labels:
+    app.kubernetes.io/part-of: financial-fds-platform

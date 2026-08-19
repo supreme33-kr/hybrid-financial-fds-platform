@@ -1,0 +1,36 @@
+---
+- name: Install common operating system packages
+  ansible.builtin.dnf:
+    name:
+      - ca-certificates
+      - curl
+      - vim-enhanced
+      - tar
+      - jq
+      - chrony
+    state: present
+
+- name: Set project timezone
+  community.general.timezone:
+    name: "{{ timezone }}"
+
+- name: Create FDS operations group
+  ansible.builtin.group:
+    name: fdsops
+    state: present
+
+- name: Create FDS administrator account
+  ansible.builtin.user:
+    name: fdsadmin
+    groups: fdsops,wheel
+    append: true
+    shell: /bin/bash
+    create_home: true
+
+- name: Apply Kubernetes-required bridge netfilter setting
+  ansible.posix.sysctl:
+    name: net.bridge.bridge-nf-call-iptables
+    value: "1"
+    state: present
+    reload: true
+  when: inventory_hostname in groups['kubernetes']

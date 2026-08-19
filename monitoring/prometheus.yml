@@ -1,0 +1,25 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+rule_files:
+  - /etc/prometheus/alerts.yml
+
+scrape_configs:
+  - job_name: fds-api
+    metrics_path: /metrics
+    static_configs:
+      - targets:
+          - fds-api:3000
+        labels:
+          environment: local
+
+  # Replace these with actual On-Prem VM addresses after the IP plan is frozen.
+  - job_name: node-exporter
+    static_configs:
+      - targets:
+          - 10.1.93.51:9100
+          - 10.1.93.52:9100
+          - 10.1.93.53:9100
+        labels:
+          environment: onprem

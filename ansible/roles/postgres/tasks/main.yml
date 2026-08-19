@@ -1,0 +1,54 @@
+---
+- name: Install PostgreSQL server packages
+  ansible.builtin.dnf:
+    name:
+      - postgresql-server
+      - postgresql
+      - python3-psycopg2
+    state: present
+
+- name: Initialize PostgreSQL data directory once
+  ansible.builtin.command: postgresql-setup --initdb
+  args:
+    creates: /var/lib/pgsql/data/PG_VERSION
+
+- name: Configure PostgreSQL listen address
+  ansible.builtin.lineinfile:
+    path: /var/lib/pgsql/data/postgresql.conf
+    regexp: '^#?listen_addresses\s*='
+    line: "listen_addresses = '{{ postgresql_listen_address }}'"
+  notify: Restart postgresql
+
+- name: Permit only approved application VM addresses to access PostgreSQL
+  ansible.builtin.lineinfile:
+    path: /var/lib/pgsql/data/pg_hba.conf
+    line: "host    {{ postgresql_database }}    {{ postgresql_app_user }}    {{ item }}    scram-sha-256"
+    create: false
+  loop: "{{ postgresql_allowed_cidrs }}"
+  notify: Restart postgresql
+
+- name: Ensure PostgreSQL service is running
+  ansible.builtin.service:
+    name: postgresql
+    state: started
+    enabled: true
+
+- name: Create FDS database user
+  become: true
+  become_user: postgres
+  ansible.builtin.shell: |
+    psql --set=app_password='{{ postgresql_app_password }}' --tuples-only --no-align \
+      --command "SELECT 1 FROM pg_roles WHERE rolname='{{ postgresql_app_user }}'" | grep -q 1 \
+      || psql --set=app_password='{{ postgresql_app_password }}' --command \
+      "CREATE ROLE {{ postgresql_app_user }} LOGIN PASSWORD :'app_password';"
+  no_log: true
+  changed_when: false
+
+- name: Create FDS database
+  become: true
+  become_user: postgres
+  ansible.builtin.shell: |
+    psql --tuples-only --no-align --command \
+      "SELECT 1 FROM pg_database WHERE datname='{{ postgresql_database }}'" | grep -q 1 \
+      || createdb --owner={{ postgresql_app_user }} {{ postgresql_database }}
+  changed_when: false

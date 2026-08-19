@@ -1,0 +1,20 @@
+timezone: Asia/Seoul
+chrony_servers:
+  - time.google.com
+  - time.cloudflare.com
+
+node_exporter_version: "1.8.2"
+node_exporter_user: node_exporter
+node_exporter_port: 9100
+
+postgresql_listen_address: "0.0.0.0"
+postgresql_port: 5432
+postgresql_database: fdsdb
+postgresql_app_user: fds_app
+# Provide this securely with Ansible Vault or CI secret; never commit a production value.
+postgresql_app_password: CHANGE_ME
+# Confirm these source addresses against the actual CNI and network policy before production use.
+postgresql_allowed_cidrs:
+  - "10.1.93.51/32"  # k8s-worker01
+  - "10.1.93.52/32"  # k8s-worker02
+  - "10.1.93.58/32"  # fds-dev-01 personal validation VM

@@ -1,0 +1,9 @@
+aws_region         = "ap-northeast-2"
+environment        = "education"
+vpc_cidr           = "10.20.0.0/16"
+availability_zones = ["ap-northeast-2a", "ap-northeast-2c"]
+# Confirm the actual network prefix with the network owner before applying Terraform.
+onprem_cidr        = "10.1.93.0/24"
+
+# Keep empty until the team and instructor approve the Hybrid connectivity design.
+transit_gateway_id = ""

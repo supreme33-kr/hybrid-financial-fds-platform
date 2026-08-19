@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: fds-api-config
+  namespace: fds
+data:
+  PORT: "3000"
+  DATABASE_SSL: "true"
+  # Add only the approved OpenShift router/proxy CIDR if source IP preservation is required.
+  TRUSTED_PROXY_CIDRS: ""

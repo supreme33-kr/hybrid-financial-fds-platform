@@ -1,0 +1,49 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: fds-postgres
+    environment:
+      POSTGRES_DB: fdsdb
+      POSTGRES_USER: fds_app
+      POSTGRES_PASSWORD: fds_dev_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/migrations/001_create_transactions.sql:/docker-entrypoint-initdb.d/001_create_transactions.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U fds_app -d fdsdb"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  fds-api:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    container_name: fds-api
+    environment:
+      PORT: "3000"
+      DATABASE_URL: postgresql://fds_app:fds_dev_password@postgres:5432/fdsdb
+      TRUSTED_PROXY_CIDRS: ""
+    ports:
+      - "3000:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  prometheus:
+    image: prom/prometheus:v3.1.0
+    container_name: fds-prometheus
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./monitoring/alerts.yml:/etc/prometheus/alerts.yml:ro
+    depends_on:
+      - fds-api
+
+volumes:
+  postgres_data:

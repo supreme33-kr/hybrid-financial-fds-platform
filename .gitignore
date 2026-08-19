@@ -1,0 +1,23 @@
+# Node.js
+app/node_modules/
+app/.env
+app/.env.*
+!app/.env.example
+
+# Secrets
+**/*secret*.yaml
+!**/*secret*.example.yaml
+*.pem
+*.key
+
+# Terraform
+terraform/**/.terraform/
+terraform/**/*.tfstate
+terraform/**/*.tfstate.*
+terraform/**/*.tfvars
+!terraform/**/*.tfvars.example
+
+# OS/editor
+.DS_Store
+.vscode/
+.idea/
